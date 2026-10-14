@@ -1,0 +1,76 @@
+
+
+
+:root {
+    --color-primary: #1b4332;   /* Verde bosque profundo y elegante */
+    --color-secondary: #2d6a4f; /* Verde ecológico natural */
+    --color-accent: #d8f3dc;    /* Verde claro suave para fondos */
+}
+
+body { 
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+    background-color: #f4f6f4;
+    color: #212529;
+    margin: 0;
+    padding: 0;
+}
+
+
+.eco-gradient {
+    background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%);
+}
+
+.card-custom {
+    background: #ffffff;
+    border: 1px solid #e2e8e0;
+    border-radius: 1rem;
+    transition: all 0.25s ease-in-out;
+    box-shadow: 0 2px 4px rgba(27, 67, 50, 0.03);
+}
+
+.card-custom:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(27, 67, 50, 0.08);
+    border-color: #52b788;
+}
+
+/* Botones de acción */
+.btn-eco {
+    background-color: #2d6a4f;
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.btn-eco:hover {
+    background-color: #1b4332;
+    box-shadow: 0 4px 12px rgba(45, 106, 79, 0.25);
+}
+
+/* Entradas y campos de formulario */
+input, select {
+    border-color: #cbd5e1 !important;
+}
+
+input:focus, select:focus {
+    border-color: #2d6a4f !important;
+    box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.15) !important;
+}
+
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

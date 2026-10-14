@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoPuntos - Gestión de Reciclaje y Canjes</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- ================= 1. CONTENEDOR DE AUTENTICACIÓN (LOGIN / REGISTRO) ================= -->
+    <div id="auth-container" class="fixed inset-0 eco-gradient bg-opacity-95 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 transition-all duration-300">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-[#d8f3dc] text-[#1b4332] rounded-full mb-4 text-2xl font-bold shadow-sm">
+                    <i class="fa-solid fa-recycle"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-slate-900">EcoPuntos</h1>
+                <p class="text-sm text-slate-500 mt-1">Recicla, acumula puntos y gana premios</p>
+            </div>
+
+            <!-- Pestañas Login / Registro -->
+            <div class="flex border-b border-slate-200 mb-6">
+                <button onclick="switchTab('login')" id="tab-login" class="flex-1 pb-3 text-sm font-semibold text-[#2d6a4f] border-b-2 border-[#2d6a4f] transition-colors">Iniciar Sesión</button>
+                <button onclick="switchTab('register')" id="tab-register" class="flex-1 pb-3 text-sm font-semibold text-slate-400 hover:text-slate-600 transition-colors">Registrarse</button>
+            </div>
+
+            <!-- Formulario de Inicio de Sesión -->
+            <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Correo Electrónico</label>
+                    <input type="email" id="login-email" required class="w-full px-4 py-2.5 rounded-lg border focus:outline-none text-sm" placeholder="usuario@correo.com">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Contraseña</label>
+                    <input type="password" id="login-password" required class="w-full px-4 py-2.5 rounded-lg border focus:outline-none text-sm" placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full py-3 btn-eco font-semibold rounded-lg shadow-md transition-colors text-sm">Entrar a la Plataforma</button>
+                <div class="text-center mt-2">
+                    <button type="button" onclick="quickDemoLogin()" class="text-xs text-[#2d6a4f] hover:underline font-medium">✨ Entrar directamente con modo Demo</button>
+                </div>
+            </form>
+
+            <!-- Formulario de Registro -->
+            <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nombre Completo</label>
+                    <input type="text" id="reg-name" required class="w-full px-4 py-2.5 rounded-lg border focus:outline-none text-sm" placeholder="Tu nombre">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Correo Electrónico</label>
+                    <input type="email" id="reg-email" required class="w-full px-4 py-2.5 rounded-lg border focus:outline-none text-sm" placeholder="usuario@correo.com">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Contraseña</label>
+                    <input type="password" id="reg-password" required class="w-full px-4 py-2.5 rounded-lg border focus:outline-none text-sm" placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full py-3 btn-eco font-semibold rounded-lg shadow-md transition-colors text-sm">Crear Cuenta</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= 2. APLICACIÓN PRINCIPAL (OCULTA HASTA LOGIN) ================= -->
+    <div id="app-container" class="hidden flex-1 flex flex-col">
+        
+        <!-- Barra de Navegación Superior -->
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 eco-gradient text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-md">
+                        <i class="fa-solid fa-recycle"></i>
+                    </div>
+                    <span class="text-xl font-bold text-slate-900 tracking-tight">Eco<span class="text-[#2d6a4f]">Puntos</span></span>
+                </div>
+
+                <!-- Menú de Navegación -->
+                <nav class="hidden md:flex space-x-1 lg:space-x-2">
+                    <button onclick="switchSection('inicio')" id="nav-inicio" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium text-[#2d6a4f] bg-[#d8f3dc] transition-colors">Inicio</button>
+                    <button onclick="switchSection('materiales')" id="nav-materiales" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors">Materiales</button>
+                    <button onclick="switchSection('puntos')" id="nav-puntos" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors">Puntos de Reciclaje</button>
+                    <button onclick="switchSection('canjes')" id="nav-canjes" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors">Canjes (Premios)</button>
+                    <button onclick="switchSection('crud')" id="nav-crud" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"><i class="fa-solid fa-sliders mr-1"></i> Gestión CRUD</button>
+                </nav>
+
+                <!-- Perfil y Puntos del Usuario -->
+                <div class="flex items-center space-x-4">
+                    <div class="bg-[#d8f3dc] border border-[#52b788] px-3 py-1.5 rounded-full flex items-center space-x-2">
+                        <i class="fa-solid fa-coins text-amber-600"></i>
+                        <span id="user-points-display" class="text-sm font-bold text-[#1b4332]">450 Pts</span>
+                    </div>
+                    <div class="flex items-center space-x-2 border-l pl-4 border-slate-200">
+                        <span id="user-name-display" class="text-sm font-medium text-slate-700 hidden sm:inline">Usuario</span>
+                        <button onclick="logout()" title="Cerrar Sesión" class="text-slate-400 hover:text-red-600 transition-colors p-1.5 rounded-lg hover:bg-red-50">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Barra móvil inferior (nav) -->
+            <div class="md:hidden flex border-t border-slate-200 overflow-x-auto py-2 px-2 bg-white space-x-1">
+                <button onclick="switchSection('inicio')" class="nav-btn-m px-3 py-1.5 rounded text-xs font-medium whitespace-nowrap bg-[#d8f3dc] text-[#2d6a4f]">Inicio</button>
+                <button onclick="switchSection('materiales')" class="nav-btn-m px-3 py-1.5 rounded text-xs font-medium whitespace-nowrap text-slate-600">Materiales</button>
+                <button onclick="switchSection('puntos')" class="nav-btn-m px-3 py-1.5 rounded text-xs font-medium whitespace-nowrap text-slate-600">Puntos</button>
+                <button onclick="switchSection('canjes')" class="nav-btn-m px-3 py-1.5 rounded text-xs font-medium whitespace-nowrap text-slate-600">Canjes</button>
+                <button onclick="switchSection('crud')" class="nav-btn-m px-3 py-1.5 rounded text-xs font-medium whitespace-nowrap text-slate-600">Gestión</button>
+            </div>
+        </header>
+
+        <!-- Contenido Dinámico de Secciones -->
+        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+            <!-- ================= SECCIÓN 1: INICIO (DASHBOARD) ================= -->
+            <section id="sec-inicio" class="space-y-6">
+                <div class="eco-gradient rounded-2xl p-6 md:p-8 text-white shadow-lg flex flex-col md:flex-row justify-between items-center">
+                    <div class="space-y-3 mb-4 md:mb-0">
+                        <span class="bg-white bg-opacity-20 text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">¡Bienvenido de nuevo!</span>
+                        <h2 class="text-2xl md:text-3xl font-bold">Cada pequeña acción cuenta para el planeta</h2>
+                        <p class="text-emerald-100 text-sm max-w-xl">Lleva el control de tus aportes ecológicos, consulta puntos de reciclaje cercanos y canjea excelentes premios económicos.</p>
+                    </div>
+                    <button onclick="switchSection('crud')" class="bg-white text-[#1b4332] hover:bg-emerald-50 font-semibold px-6 py-3 rounded-xl shadow transition-all text-sm whitespace-nowrap">
+                        <i class="fa-solid fa-plus-circle mr-2"></i> Registrar Reciclaje
+                    </button>
+                </div>
+
+                <!-- Tarjetas de Estadísticas -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div class="card-custom p-6 flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-[#d8f3dc] text-[#2d6a4f] rounded-xl flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-scale-balanced"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold uppercase text-slate-400">Total Reciclado</p>
+                            <h3 class="text-2xl font-bold text-slate-800" id="stat-kilos">18.5 kg</h3>
+                        </div>
+                    </div>
+                    <div class="card-custom p-6 flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-coins"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold uppercase text-slate-400">Puntos Actuales</p>
+                            <h3 class="text-2xl font-bold text-slate-800" id="stat-points">450 Pts</h3>
+                        </div>
+                    </div>
+                    <div class="card-custom p-6 flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-gift"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold uppercase text-slate-400">Premios Canjeados</p>
+                            <h3 class="text-2xl font-bold text-slate-800" id="stat-canjes">2</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historial Reciente -->
+                <div class="card-custom p-6">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4">Actividad Reciente de Reciclaje</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-600">
+                            <thead class="bg-slate-50 text-slate-700 uppercase text-xs font-semibold">
+                                <tr>
+                                    <th class="p-3 rounded-l-lg">Material</th>
+                                    <th class="p-3">Cantidad</th>
+                                    <th class="p-3">Puntos Ganados</th>
+                                    <th class="p-3 rounded-r-lg">Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-activity-table" class="divide-y divide-slate-100">
+                                <!-- Se llena por JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= SECCIÓN 2: MATERIALES ================= -->
+            <section id="sec-materiales" class="space-y-6 hidden">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900">Materiales Aceptados</h2>
+                        <p class="text-sm text-slate-500">Conoce los materiales que puedes reciclar y cuántos puntos otorgan por kilo.</p>
+                    </div>
+                    <div class="w-full sm:w-72">
+                        <input type="text" id="search-material" oninput="renderMateriales()" placeholder="Buscar material..." class="w-full px-4 py-2 border rounded-xl text-sm focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="materiales-grid">
+                    <!-- Se llena con JS -->
+                </div>
+            </section>
+
+            <!-- ================= SECCIÓN 3: PUNTOS DE RECICLAJE ================= -->
+            <section id="sec-puntos" class="space-y-6 hidden">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Puntos de Reciclaje Habilitados</h2>
+                    <p class="text-sm text-slate-500">Ubica el centro de recolección más cercano para llevar tus materiales.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="puntos-grid">
+                    <!-- Se llena con JS -->
+                </div>
+            </section>
+
+            <!-- ================= SECCIÓN 4: CANJES (PREMIOS BARATOS Y BALONES) ================= -->
+            <section id="sec-canjes" class="space-y-6 hidden">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900">Tienda de Canjes Ecológicos</h2>
+                        <p class="text-sm text-slate-500">Canjea tus puntos acumulados por balones, tomatodos, cuadernos y accesorios económicos.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="canjes-grid">
+                    <!-- Se llena con JS -->
+                </div>
+            </section>
+
+            <!-- ================= SECCIÓN 5: GESTIÓN CRUD (COMPLETO) ================= -->
+            <section id="sec-crud" class="space-y-6 hidden">
+                <div class="card-custom p-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-slate-100">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900">Panel de Gestión (CRUD)</h2>
+                            <p class="text-xs text-slate-500">Administra registros de reciclaje, materiales o premios de canje.</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="setCrudTab('registros')" id="crud-tab-reg" class="px-4 py-2 text-xs font-semibold rounded-lg btn-eco transition-colors">Mis Registros</button>
+                            <button onclick="setCrudTab('materiales')" id="crud-tab-mat" class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Materiales</button>
+                            <button onclick="setCrudTab('premios')" id="crud-tab-pre" class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Premios / Canjes</button>
+                        </div>
+                    </div>
+
+                    <!-- Botón para Agregar Nuevo Elemento -->
+                    <div class="mb-4 flex justify-end">
+                        <button onclick="openModal()" class="btn-eco text-xs font-semibold px-4 py-2.5 rounded-lg shadow transition-colors flex items-center space-x-2">
+                            <i class="fa-solid fa-plus"></i> <span id="btn-add-text">Nuevo Registro</span>
+                        </button>
+                    </div>
+
+                    <!-- Tabla CRUD Dinámica -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-600">
+                            <thead id="crud-table-head" class="bg-slate-50 text-slate-700 uppercase text-xs font-semibold">
+                                <!-- Cabecera dinámica -->
+                            </thead>
+                            <tbody id="crud-table-body" class="divide-y divide-slate-100">
+                                <!-- Cuerpo dinámico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Pie de página -->
+        <footer class="bg-white border-t border-slate-200 mt-auto py-6">
+            <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-400">
+                &copy; 2026 EcoPuntos. Plataforma comunitaria de reciclaje y desarrollo sostenible.
+            </div>
+        </footer>
+    </div>
+
+    <!-- ================= 3. MODAL PARA CREAR / EDITAR (CRUD) ================= -->
+    <div id="crud-modal" class="fixed inset-0 bg-slate-900 bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                <h3 id="modal-title" class="text-lg font-bold text-slate-900">Agregar Elemento</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="crud-form" onsubmit="handleCrudSubmit(event)" class="space-y-4">
+                <input type="hidden" id="edit-index" value="-1">
+                <div id="modal-fields">
+                    <!-- Campos inyectados por JS según la pestaña activa -->
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded-lg text-xs font-semibold btn-eco">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script de la aplicación -->
+    <script src="script.js"></script>
+</body>
+</html>
